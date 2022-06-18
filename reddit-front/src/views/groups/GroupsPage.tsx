@@ -110,7 +110,15 @@ export default function GroupsPage() {
                     subheader={''}
                 />
                 <CardActions disableSpacing>
-                    <IconButton aria-label="sign">
+                  <Button  aria-label="sign" onClick={ () => {sign(item.belongs, item.id)} }>
+                    { 
+                      item.belongs ? 'Exit' : 'Enter'
+                    }
+                    { 
+                        item.belongs ? <CloseIcon /> : <CheckIcon />
+                      }
+                  </Button>
+                    {/* <IconButton aria-label="sign">
                       { 
                         item.belongs ? 'Exit' : 'Enter'
                       }
@@ -119,7 +127,7 @@ export default function GroupsPage() {
                       { 
                         item.belongs ? <CloseIcon /> : <CheckIcon />
                       }
-                    </IconButton>
+                    </IconButton> */}
                     <IconButton aria-label="vote value" onClick={ () => { navigateToPosts(item.id, item.belongs) }}>
                       Visit group
                     </IconButton>
