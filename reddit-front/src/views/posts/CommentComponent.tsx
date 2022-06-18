@@ -98,13 +98,10 @@ export default function RecipeReviewCard(props: any) {
   React.useEffect( () => {
     setValueVote(props.personalValue);
     fetchData();
-    // console.log("value vote: ")
-    // console.log(valueVote);
   }, []);
 
   const upVote = async () => {
     //   console.log(valueVote);
-    console.log(props.id_comments)
       if(valueVote == null){
         setLikeResult((likeResult)+1); 
         setValueVote(1);

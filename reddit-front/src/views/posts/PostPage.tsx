@@ -60,6 +60,7 @@ export default function PostPage(props: any) {
   const [expanded, setExpanded] = React.useState(false);
   const [isOpenShare, setOpenShare] = React.useState(false);
   const [groups, setGroups] = React.useState([]);
+  const [isShowComment, setShowComment] = React.useState(false);
   const colors = [red[500], green[500], yellow[500], orange[500], blue[500]];
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -136,8 +137,8 @@ export default function PostPage(props: any) {
 
   const addPostToGroupAction = async (_id_groups: number, _id_posts: number) => {
     const data = {id_groups : _id_groups, id_posts : _id_posts};
-    console.log('addPostToGroupAction');
-    console.log(data);
+    // console.log('addPostToGroupAction');
+    // console.log(data);
     await fetch(generateURL('/posts/addPostToGroup'), generateRequestConfig({
       method: 'POST',
       body: JSON.stringify(data)
@@ -212,8 +213,8 @@ export default function PostPage(props: any) {
 
   async function submit(event: any){
     event.preventDefault();
-      console.log("id_posts: ", id_posts);
-      console.log("content: ", contentForm);
+      // console.log("id_posts: ", id_posts);
+      // console.log("content: ", contentForm);
 
     const data = {comment_content: contentForm, id_posts: id_posts};
     await fetch(generateURL('/comments/addComment'), generateRequestConfig({
@@ -224,14 +225,14 @@ export default function PostPage(props: any) {
   }
 
   const shareAction = async (e:any) => {
-    console.log("shared!");
+    // console.log("shared!");
     let {name, value} = e.target;
-    console.log(value);
+    // console.log(value);
     if(value === -1){
       return;
     }
     if(id_posts != undefined){
-      console.log(value, id_posts);
+      // console.log(value, id_posts);
       addPostToGroupAction(value, parseInt(id_posts));
     }
     setOpenShare(false);
@@ -298,7 +299,7 @@ export default function PostPage(props: any) {
             </IconButton>
         </CardActions>
         </Card>
-        <Accordion>
+        <Accordion onChange={ () => { setShowComment(!isShowComment) }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
@@ -332,9 +333,9 @@ export default function PostPage(props: any) {
             </Accordion>
           </Grid>
           <div>
-          {
+          { isShowComment && 
             comments.map( (item:any, key: any) => (
-              <CommentComponent 
+              <CommentComponent
               id_posts={id_posts}
               value={item.value}
               personalValue={ likeCommentResult.has(item.id)? likeCommentResult.get(item.id) : null }

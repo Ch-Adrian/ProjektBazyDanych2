@@ -127,7 +127,7 @@ const CommentRepository: ICommentController = {
             WHERE id_comments = $1 and id_users = $2;`,
                 [id_comments, id_users]
         );
-        if(res.rows.length != 0){
+        if(res.rows.length !== 0){
             return;
         }
         await db.query(
@@ -143,7 +143,7 @@ const CommentRepository: ICommentController = {
             WHERE id_comments = $1 and id_users = $2;`,
                 [id_comments, id_users]
         );
-        if(res.rows.length == 0){
+        if(res.rows.length === 0){
             return;
         }
         await db.query(
