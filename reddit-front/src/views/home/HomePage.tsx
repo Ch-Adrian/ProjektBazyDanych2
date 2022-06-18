@@ -34,8 +34,6 @@ export default function PostsPage(props: any) {
         res
           .json()
           .then(res => {
-            // console.log("value res:");
-            // console.log(res.value);
             var mapp = new Map();
             res.value.map((ele: {id_posts: number, value: number})=>{
               mapp.set(ele.id_posts, ele.value);
@@ -48,7 +46,6 @@ export default function PostsPage(props: any) {
       useEffect(() => {
         fetchData();
         fetchDataValueForUser();
-        // console.log(planets);
       }, []);
 
 

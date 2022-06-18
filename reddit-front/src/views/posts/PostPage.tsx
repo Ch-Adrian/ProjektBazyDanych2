@@ -94,8 +94,6 @@ export default function PostPage(props: any) {
     res
       .json()
       .then(res => {
-        // console.log("value res:");
-        // console.log(res.value);
         var mapp = new Map();
         res.value.map((ele: {id_comments: number, value: number})=>{
           mapp.set(ele.id_comments, ele.value);
@@ -115,7 +113,6 @@ export default function PostPage(props: any) {
     res
       .json()
       .then(res => {
-        // console.log(res);
         setGroups(res.groups);
       })
       .catch(err => setErrors(err));
@@ -154,7 +151,6 @@ export default function PostPage(props: any) {
     }, []);
 
     const upVote = async () => {
-      // console.log(id_posts);
 
       if(valueVote == null){
         setLikeResult((likeResult)+1); 
@@ -183,7 +179,6 @@ export default function PostPage(props: any) {
   }
 
   const downVote = () => {
-    // console.log(valueVote);
 
     if(valueVote == null){
       setLikeResult((likeResult)-1); 
@@ -340,6 +335,7 @@ export default function PostPage(props: any) {
           {
             comments.map( (item:any, key: any) => (
               <CommentComponent 
+              id_posts={id_posts}
               value={item.value}
               personalValue={ likeCommentResult.has(item.id)? likeCommentResult.get(item.id) : null }
               key={item.id}

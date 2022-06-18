@@ -256,8 +256,6 @@ postController.get('', asyncWrapper(async (req, res) => {
   }));
 
   postController.get('/likeResultUser', asyncWrapper(async (req, res) => {
-    // console.log(req.session.user?.id);
-    // console.log("inside post");
     const val = await PostRepository.getLikeResultWithUser(
         parseInt(req.session.user?.id));
 
@@ -289,16 +287,12 @@ postController.get('', asyncWrapper(async (req, res) => {
 
   postController.post('/addPost', asyncWrapper(async (req, res) => {
     const userId = +req.session.user?.id;
-    // console.log(userId, req.body.title)
-    console.log(userId, req.body.title , req.body.post_content, +req.body.id_group);
-    // await PostRepository.addPost(userId, req.body.title , req.body.post_content);
     await PostRepository.addPostWithGroup(userId, req.body.title , req.body.post_content, +req.body.id_group);
     res.status(200).json({});
   }));
 
   postController.post('/addPostToGroup', asyncWrapper(async (req, res) => {
     const userId = +req.session.user?.id;
-    console.log('/post/addPostToGroup');
     await PostRepository.addPostToGroup(+req.body.id_groups, +req.body.id_posts);
     res.status(200).json({});
   }));

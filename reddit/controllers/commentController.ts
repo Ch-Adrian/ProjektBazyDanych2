@@ -31,6 +31,7 @@ interface ICommentController {
     }[]> ;
     getLikeResult(id_comments: number): Promise<number>;
     addComment(id_posts: number, id_users: number, comment_content: string): Promise<boolean>;
+    addCommentToPost(id_comments: number, id_posts: number): Promise<boolean> ;
     getLikeResultWithUser(id_users: number): Promise<ValueRow[]>;
     insertVote(id_comments: number, id_users: number, value: number): Promise<void>;
     updateVote(id_comments: number, id_users: number, value: number): Promise<void>;
@@ -63,7 +64,6 @@ const CommentRepository: ICommentController = {
             WHERE id_comments = $1;`,
             [id_comments]
         );
-        // console.log(result)
         return result.rows[0];
     },
     async addComment(id_posts: number, id_users: number, comment_content: string):
@@ -89,7 +89,24 @@ const CommentRepository: ICommentController = {
             VALUES ($1, $2);`,
             [id_posts, result_id.rows[0].id]
         );
-        // console.log(result);
+        return true;
+    },
+    async addCommentToPost(id_posts: number, id_comments: number):
+    Promise<boolean> {
+        console.log("addCommentToPostMethod");
+        const result = await db.query(
+            `SELECT * FROM comments_in_posts WHERE id_posts = $1 AND id_comments = $2;`,
+            [id_posts, id_comments]
+        );
+        if(result.rows.length !== 0){
+            console.log("Item exists in database.");
+            return false;
+        };
+        const result2 = await db.query(
+            `INSERT INTO comments_in_posts (id_posts, id_comments)
+            VALUES ($1, $2);`,
+            [id_posts, id_comments]
+        );
         return true;
     },
     async getLikeResultWithUser(id_users: number): Promise<ValueRow[]>{
@@ -98,13 +115,10 @@ const CommentRepository: ICommentController = {
             WHERE id_users = $1;`,
             [id_users]
         );
-        // console.log(result.rows)
         var arr = Array();
         result.rows.map((arg1)=>{
-            // console.log(arg1);
             arr.push(ValueRow.fromJson(arg1));
         });
-        // console.log(arr);
         return arr;
     }, 
     async insertVote(id_comments: number, id_users: number, value: number): Promise<void>{
@@ -165,7 +179,6 @@ commentController.get('/commentsForPost/:id_posts', asyncWrapper(async (req, res
   }));
 
   commentController.get('/likeResultUser', asyncWrapper(async (req, res) => {
-    // console.log("inside post");
     const val = await CommentRepository.getLikeResultWithUser(
         parseInt(req.session.user?.id));
 
@@ -177,9 +190,13 @@ commentController.get('/commentsForPost/:id_posts', asyncWrapper(async (req, res
 
   commentController.post('/addComment', asyncWrapper(async (req, res) => {
     const userId = +req.session.user?.id;
-    console.log(req.body.comment_content);
-    console.log(+req.body.id_posts);
     await CommentRepository.addComment(+req.body.id_posts, userId, req.body.comment_content)
+    res.status(200).json({});
+  }));
+
+  commentController.post('/addCommentToPost', asyncWrapper(async (req, res) => {
+    const userId = +req.session.user?.id;
+    await CommentRepository.addCommentToPost(+req.body.id_posts, +req.body.id_comments);
     res.status(200).json({});
   }));
 
