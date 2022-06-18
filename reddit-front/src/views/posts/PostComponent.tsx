@@ -25,6 +25,11 @@ import PostPage from './PostPage';
 import { useQuery } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { isConstructorDeclaration } from 'typescript';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+// import ShareIcon from '@mui/icons-material/Share';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -134,6 +139,7 @@ export default function RecipeReviewCard(props: any) {
     // setValueVote(props.value);
     setValueVote(props.personalValue);
   }, []);
+
 
   const upVote = async () => {
       // console.log(valueVote);

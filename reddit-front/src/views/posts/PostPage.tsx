@@ -25,6 +25,10 @@ import { useQuery } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { generateRequestConfig, generateURL } from 'config';
 import CommentComponent from './CommentComponent';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -54,6 +58,8 @@ export default function PostPage(props: any) {
     const [contentForm, setContentForm] = React.useState('');
   const [hasError, setErrors] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
+  const [isOpenShare, setOpenShare] = React.useState(false);
+  const [groups, setGroups] = React.useState([]);
   const colors = [red[500], green[500], yellow[500], orange[500], blue[500]];
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -100,6 +106,21 @@ export default function PostPage(props: any) {
       .catch(err => setErrors(err));
   }
 
+  async function fetchDataGroups() {
+    // console.log('fetching');
+    const res = await fetch(generateURL('/groups'), generateRequestConfig({
+      method: 'GET'
+    }));
+
+    res
+      .json()
+      .then(res => {
+        // console.log(res);
+        setGroups(res.groups);
+      })
+      .catch(err => setErrors(err));
+  }
+
   const onVoteUpdate = async (_id_posts: number, _value: number) => {
     const data = {id_posts : _id_posts, value: _value};
     await fetch(generateURL('/posts/updateVote'), generateRequestConfig({
@@ -116,9 +137,20 @@ export default function PostPage(props: any) {
     }));
   };
 
+  const addPostToGroupAction = async (_id_groups: number, _id_posts: number) => {
+    const data = {id_groups : _id_groups, id_posts : _id_posts};
+    console.log('addPostToGroupAction');
+    console.log(data);
+    await fetch(generateURL('/posts/addPostToGroup'), generateRequestConfig({
+      method: 'POST',
+      body: JSON.stringify(data)
+    }));
+  };
+
     React.useEffect(()=>{
       fetchData();
       fetchDataValueForUser();
+      fetchDataGroups();
     }, []);
 
     const upVote = async () => {
@@ -196,6 +228,24 @@ export default function PostPage(props: any) {
 
   }
 
+  const shareAction = async (e:any) => {
+    console.log("shared!");
+    let {name, value} = e.target;
+    console.log(value);
+    if(value === -1){
+      return;
+    }
+    if(id_posts != undefined){
+      console.log(value, id_posts);
+      addPostToGroupAction(value, parseInt(id_posts));
+    }
+    setOpenShare(false);
+  }
+
+  const shareButton = async () =>{
+    setOpenShare(true);
+  }
+
   return (
       <Grid   
       container
@@ -218,6 +268,30 @@ export default function PostPage(props: any) {
             </Typography>
         </CardContent>
         <CardActions disableSpacing>
+          {isOpenShare && 
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Group</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={-1}
+            label="Group"
+            onChange={shareAction}
+          >
+            {
+              groups.filter((ele: any, idx: any, arr:any)=>{
+                return ele.belongs;
+              })
+              .map( (item: any, key: any) => (
+                  <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
+              ))
+            }
+          </Select>
+        </FormControl>
+        }
+          <ShareIcon aria-label="share" onClick={ shareButton } >
+
+          </ShareIcon>
             <IconButton aria-label="upvote" onClick={ upVote }>
               <ThumbUpIcon />
             </IconButton>

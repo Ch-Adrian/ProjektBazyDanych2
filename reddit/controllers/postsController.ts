@@ -47,6 +47,8 @@ interface IPostController {
     addPost(id_users: number, title: string, post_content: string): Promise<boolean>;
     addPostWithGroup(id_users: number, title: string, post_content: string, id_group: number):
     Promise<boolean>;
+    addPostToGroup(id_groups: number,id_posts: number):
+    Promise<boolean>;
     insertVote(id_posts: number, id_users: number, value: number): Promise<void>;
     updateVote(id_posts: number, id_users: number, value: number): Promise<void>;
 }
@@ -176,7 +178,25 @@ const PostRepository: IPostController = {
         console.log(result2);
         return true;
     },
-
+    async addPostToGroup(id_groups: number,id_posts: number):
+    Promise<boolean>{
+        console.log("addPostToGroupMethod");
+        const result1 = await db.query(
+            `SELECT * FROM posts_in_groups where id_groups = $1 AND id_posts = $2;`,
+            [id_groups, id_posts]
+        );
+        if(result1.rows.length !== 0){
+            console.log("Item exists in database.");
+            return false;
+        }
+        const result = await db.query(
+            `INSERT INTO posts_in_groups (id_groups, id_posts)
+            VALUES ($1, $2);`,
+            [id_groups, id_posts]
+        );
+        console.log(result);
+        return true;
+    },
     async insertVote(id_posts: number, id_users: number, value: number): Promise<void>{
         const res = await db.query(
             `SELECT * FROM posts_votes 
@@ -273,6 +293,13 @@ postController.get('', asyncWrapper(async (req, res) => {
     console.log(userId, req.body.title , req.body.post_content, +req.body.id_group);
     // await PostRepository.addPost(userId, req.body.title , req.body.post_content);
     await PostRepository.addPostWithGroup(userId, req.body.title , req.body.post_content, +req.body.id_group);
+    res.status(200).json({});
+  }));
+
+  postController.post('/addPostToGroup', asyncWrapper(async (req, res) => {
+    const userId = +req.session.user?.id;
+    console.log('/post/addPostToGroup');
+    await PostRepository.addPostToGroup(+req.body.id_groups, +req.body.id_posts);
     res.status(200).json({});
   }));
   
